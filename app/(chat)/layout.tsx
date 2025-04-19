@@ -1,10 +1,12 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { SupabaseUserProvider } from '@/components/supabase-user-context';
 import AppSidebarWithUser from '@/components/app-sidebar-with-user';
 import ClientOnly from '@/components/client-only';
 import Script from 'next/script';
+import RequireAuthClient from './require-auth-client';
 
 export const experimental_ppr = true;
 
@@ -23,12 +25,14 @@ export default async function Layout({
         strategy="beforeInteractive"
       />
       <SupabaseUserProvider>
-        <SidebarProvider defaultOpen={!isCollapsed}>
-          <ClientOnly>
-            <AppSidebarWithUser />
-          </ClientOnly>
-          <SidebarInset>{children}</SidebarInset>
-        </SidebarProvider>
+        <RequireAuthClient>
+          <SidebarProvider defaultOpen={!isCollapsed}>
+            <ClientOnly>
+              <AppSidebarWithUser />
+            </ClientOnly>
+            <SidebarInset>{children}</SidebarInset>
+          </SidebarProvider>
+        </RequireAuthClient>
       </SupabaseUserProvider>
     </>
   );

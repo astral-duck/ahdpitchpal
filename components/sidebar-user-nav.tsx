@@ -2,6 +2,7 @@
 import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
 
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export function SidebarUserNav({ user }: { user: any }) {
   const { setTheme, theme } = useTheme();
+  const isAdmin = user?.email === 'stevenjleipzig@gmail.com';
 
   if (!user) {
     return (
@@ -58,6 +60,18 @@ export function SidebarUserNav({ user }: { user: any }) {
               onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin-dashboard">
+                <button
+                  type="button"
+                  className={`w-full text-left cursor-pointer ${
+                    isAdmin ? '' : 'opacity-50 pointer-events-none'
+                  }`}
+                >
+                  Admin Dashboard
+                </button>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
