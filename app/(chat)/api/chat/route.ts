@@ -5,8 +5,7 @@ import {
   smoothStream,
   streamText,
 } from 'ai';
-import { auth } from '@/app/(auth)/auth';
-import { systemPrompt } from '@/lib/ai/prompts';
+
 import {
   deleteChatById,
   getChatById,
@@ -25,10 +24,20 @@ import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
+import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
+
+// TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   try {
     const {
       id,
@@ -39,12 +48,6 @@ export async function POST(request: Request) {
       messages: Array<UIMessage>;
       selectedChatModel: string;
     } = await request.json();
-
-    const session = await auth();
-
-    if (!session || !session.user || !session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
-    }
 
     const userMessage = getMostRecentUserMessage(messages);
 
@@ -59,9 +62,9 @@ export async function POST(request: Request) {
         message: userMessage,
       });
 
-      await saveChat({ id, userId: session.user.id, title });
+      await saveChat({ id, userId: user.id, title });
     } else {
-      if (chat.userId !== session.user.id) {
+      if (chat.userId !== user.id) {
         return new Response('Unauthorized', { status: 401 });
       }
     }
@@ -99,15 +102,15 @@ export async function POST(request: Request) {
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({ userId: user.id, dataStream }),
+            updateDocument: updateDocument({ userId: user.id, dataStream }),
             requestSuggestions: requestSuggestions({
-              session,
+              userId: user.id,
               dataStream,
             }),
           },
           onFinish: async ({ response }) => {
-            if (session.user?.id) {
+            if (user.id) {
               try {
                 const assistantId = getTrailingMessageId({
                   messages: response.messages.filter(
@@ -166,6 +169,13 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
@@ -173,16 +183,10 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-
   try {
     const chat = await getChatById({ id });
 
-    if (chat.userId !== session.user.id) {
+    if (chat.userId !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
 

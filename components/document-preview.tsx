@@ -21,6 +21,7 @@ import { useArtifact } from '@/hooks/use-artifact';
 import equal from 'fast-deep-equal';
 import { SpreadsheetEditor } from './sheet-editor';
 import { ImageEditor } from './image-editor';
+import { fetchWithSupabaseAuth } from '@/lib/fetchWithSupabaseAuth';
 
 interface DocumentPreviewProps {
   isReadonly: boolean;
@@ -35,9 +36,15 @@ export function DocumentPreview({
 }: DocumentPreviewProps) {
   const { artifact, setArtifact } = useArtifact();
 
+  const fetcherWithAuth = async (url: string) => {
+    const res = await fetchWithSupabaseAuth(url);
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  };
+
   const { data: documents, isLoading: isDocumentsFetching } = useSWR<
     Array<Document>
-  >(result ? `/api/document?id=${result.id}` : null, fetcher);
+  >(result ? `/api/document?id=${result.id}` : null, fetcherWithAuth);
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
   const hitboxRef = useRef<HTMLDivElement>(null);

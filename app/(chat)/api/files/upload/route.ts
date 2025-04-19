@@ -1,8 +1,9 @@
 import { put } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
 
-import { auth } from '@/app/(auth)/auth';
+// TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
 // Use Blob instead of File since File is not available in Node.js environment
 const FileSchema = z.object({
@@ -18,10 +19,11 @@ const FileSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
   }
 
   if (request.body === null) {

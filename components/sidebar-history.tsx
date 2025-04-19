@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
+import { fetchWithSupabaseAuth } from '@/lib/fetchWithSupabaseAuth';
 import { ChatItem } from './sidebar-history-item';
 import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from './icons';
@@ -129,7 +130,7 @@ export function SidebarHistory({ user }: { user: any }) {
     : false;
 
   const handleDelete = async () => {
-    const deletePromise = fetch(`/api/chat?id=${deleteId}`, {
+    const deletePromise = fetchWithSupabaseAuth(`/api/chat?id=${deleteId}`, {
       method: 'DELETE',
     });
 

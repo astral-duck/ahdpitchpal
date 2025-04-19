@@ -11,6 +11,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 import type { DBMessage, Document } from '@/lib/db/schema';
+import { fetchWithSupabaseAuth } from './fetchWithSupabaseAuth';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -22,7 +23,7 @@ interface ApplicationError extends Error {
 }
 
 export const fetcher = async (url: string) => {
-  const res = await fetch(url);
+  const res = await fetchWithSupabaseAuth(url);
 
   if (!res.ok) {
     const error = new Error(

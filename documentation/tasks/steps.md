@@ -28,7 +28,10 @@
 
 ## Step 6: Admin Dashboard
 - [ ] Manage users (Supabase), knowledge base, feedback, Grok settings
-- [ ] Analytics: top 5 FAQs, usage stats
+- [ ] Analytics: top 5 FAQs, usage stats, total conversations, total requests, tokens in/out, monthly cost (by month)
+- [ ] Analytics homescreen: summary cards for conversations, requests, tokens, cost (monthly)
+- [ ] Analytics homescreen: top 5 FAQs
+- [ ] Analytics homescreen: feedback panel
 
 ## Step 7: Testing & Launch
 - [ ] E2E tests (Playwright)

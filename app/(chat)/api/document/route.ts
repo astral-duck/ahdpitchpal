@@ -1,23 +1,26 @@
-import { auth } from '@/app/(auth)/auth';
 import type { ArtifactKind } from '@/components/artifact';
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
   saveDocument,
 } from '@/lib/db/queries';
+import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
+
+// TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
 export async function GET(request: Request) {
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
   if (!id) {
     return new Response('Missing id', { status: 400 });
-  }
-
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return new Response('Unauthorized', { status: 401 });
   }
 
   const documents = await getDocumentsById({ id });
@@ -28,7 +31,7 @@ export async function GET(request: Request) {
     return new Response('Not found', { status: 404 });
   }
 
-  if (document.userId !== session.user.id) {
+  if (document.userId !== user.id) {
     return new Response('Forbidden', { status: 403 });
   }
 
@@ -36,17 +39,18 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
   if (!id) {
     return new Response('Missing id', { status: 400 });
-  }
-
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return new Response('Unauthorized', { status: 401 });
   }
 
   const {
@@ -61,7 +65,7 @@ export async function POST(request: Request) {
   if (documents.length > 0) {
     const [document] = documents;
 
-    if (document.userId !== session.user.id) {
+    if (document.userId !== user.id) {
       return new Response('Forbidden', { status: 403 });
     }
   }
@@ -71,13 +75,20 @@ export async function POST(request: Request) {
     content,
     title,
     kind,
-    userId: session.user.id,
+    userId: user.id,
   });
 
   return Response.json(document, { status: 200 });
 }
 
 export async function DELETE(request: Request) {
+  let user;
+  try {
+    ({ user } = await verifySupabaseServerAuth(request));
+  } catch {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   const timestamp = searchParams.get('timestamp');
@@ -90,17 +101,11 @@ export async function DELETE(request: Request) {
     return new Response('Missing timestamp', { status: 400 });
   }
 
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-
   const documents = await getDocumentsById({ id });
 
   const [document] = documents;
 
-  if (document.userId !== session.user.id) {
+  if (document.userId !== user.id) {
     return new Response('Unauthorized', { status: 401 });
   }
 
