@@ -6,7 +6,6 @@ import { ArtifactKind } from '@/components/artifact';
 import { DataStreamWriter } from 'ai';
 import { Document } from '../db/schema';
 import { saveDocument } from '../db/queries';
-import { Session } from 'next-auth';
 
 export interface SaveDocumentProps {
   id: string;
@@ -20,14 +19,14 @@ export interface CreateDocumentCallbackProps {
   id: string;
   title: string;
   dataStream: DataStreamWriter;
-  session: Session;
+  session: any;
 }
 
 export interface UpdateDocumentCallbackProps {
   document: Document;
   description: string;
   dataStream: DataStreamWriter;
-  session: Session;
+  session: any;
 }
 
 export interface DocumentHandler<T = ArtifactKind> {

@@ -1,14 +1,13 @@
 import { generateUUID } from '@/lib/utils';
 import { DataStreamWriter, tool } from 'ai';
 import { z } from 'zod';
-import { Session } from 'next-auth';
 import {
   artifactKinds,
   documentHandlersByArtifactKind,
 } from '@/lib/artifacts/server';
 
 interface CreateDocumentProps {
-  session: Session;
+  session: any;
   dataStream: DataStreamWriter;
 }
 

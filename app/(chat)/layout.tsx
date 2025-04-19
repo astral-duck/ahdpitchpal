@@ -1,8 +1,9 @@
 import { cookies } from 'next/headers';
 
-import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { auth } from '../(auth)/auth';
+import { SupabaseUserProvider } from '@/components/supabase-user-context';
+import AppSidebarWithUser from '@/components/app-sidebar-with-user';
+import ClientOnly from '@/components/client-only';
 import Script from 'next/script';
 
 export const experimental_ppr = true;
@@ -12,7 +13,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const [session, cookieStore] = await Promise.all([auth(), cookies()]);
+  const cookieStore = await cookies();
   const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
 
   return (
@@ -21,10 +22,14 @@ export default async function Layout({
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
       />
-      <SidebarProvider defaultOpen={!isCollapsed}>
-        <AppSidebar user={session?.user} />
-        <SidebarInset>{children}</SidebarInset>
-      </SidebarProvider>
+      <SupabaseUserProvider>
+        <SidebarProvider defaultOpen={!isCollapsed}>
+          <ClientOnly>
+            <AppSidebarWithUser />
+          </ClientOnly>
+          <SidebarInset>{children}</SidebarInset>
+        </SidebarProvider>
+      </SupabaseUserProvider>
     </>
   );
 }

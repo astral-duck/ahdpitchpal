@@ -1,72 +1,69 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import { toast } from '@/components/toast';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/lib/supabaseClient";
 
-import { AuthForm } from '@/components/auth-form';
-import { SubmitButton } from '@/components/submit-button';
+const customTheme = {
+  default: {
+    colors: {
+      brand: "#004b91", // American Home Design blue
+      brandAccent: "#0077cc", // Accent blue
+      inputBorder: "#004b91",
+      inputLabelText: "#004b91",
+      buttonText: "#fff",
+      messageText: "#d32f2f",
+      anchorText: "#004b91",
+    },
+    radii: {
+      borderRadiusButton: "0.5rem",
+      borderRadiusInput: "0.5rem",
+    },
+    fontSizes: {
+      baseBodySize: "1.1rem",
+      baseInputSize: "1.1rem",
+      baseLabelSize: "1rem",
+      baseButtonSize: "1.1rem",
+    },
+  },
+};
 
-import { login, type LoginActionState } from '../actions';
-
-export default function Page() {
+export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
-
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
-
   useEffect(() => {
-    if (state.status === 'failed') {
-      toast({
-        type: 'error',
-        description: 'Invalid credentials!',
-      });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: 'Failed validating your submission!',
-      });
-    } else if (state.status === 'success') {
-      setIsSuccessful(true);
-      router.refresh();
-    }
-  }, [state.status]);
-
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
-  };
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        router.push("/"); // Redirect to home/chatbot after login
+      }
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, [router]);
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Use your email and password to sign in
-          </p>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-md">
+        <Auth
+          supabaseClient={supabase}
+          appearance={{
+            theme: ThemeSupa,
+            variables: customTheme.default,
+            style: {
+              button: { backgroundColor: "#004b91", color: "#fff", fontWeight: 600 },
+              anchor: { color: "#004b91", fontWeight: 500 },
+            },
+          }}
+          theme="light"
+          providers={[]}
+          view="sign_in" // Only show sign-in, hide sign-up
+        />
+        <div className="mt-4 text-center">
+          <span className="inline-block px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">American Home Design Sales Portal</span>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"Don't have an account? "}
-            <Link
-              href="/register"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
-            >
-              Sign up
-            </Link>
-            {' for free.'}
-          </p>
-        </AuthForm>
       </div>
     </div>
   );
