@@ -1,5 +1,11 @@
 import { NextRequest } from 'next/server';
-import { getChatsByUserId } from '@/lib/db/queries';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // This endpoint now expects the user id to be provided in a query param or header (since Supabase Auth is client-side only)
 
@@ -23,12 +29,23 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const chats = await getChatsByUserId({
-      id: userId,
-      limit,
-      startingAfter,
-      endingBefore,
-    });
+    // Fetch chats directly from Supabase
+    let query = supabase
+      .from('chats')
+      .select('*')
+      .eq('userId', userId)
+      .order('createdAt', { ascending: false });
+
+    if (startingAfter) {
+      query = query.lt('id', startingAfter);
+    } else if (endingBefore) {
+      query = query.gt('id', endingBefore);
+    }
+
+    query = query.limit(limit);
+
+    const { data: chats, error } = await query;
+    if (error) throw error;
 
     return Response.json(chats);
   } catch (_) {

@@ -1,5 +1,11 @@
-import { getChatById, getVotesByChatId, voteMessage } from '@/lib/db/queries';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
 import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
@@ -18,9 +24,12 @@ export async function GET(request: Request) {
     return new Response('chatId is required', { status: 400 });
   }
 
-  const chat = await getChatById({ id: chatId });
-
-  if (!chat) {
+  const { data: chat, error: chatError } = await supabase
+    .from('chats')
+    .select('*')
+    .eq('id', chatId)
+    .single();
+  if (chatError || !chat) {
     return new Response('Chat not found', { status: 404 });
   }
 
@@ -28,7 +37,11 @@ export async function GET(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const votes = await getVotesByChatId({ id: chatId });
+  const { data: votes, error: votesError } = await supabase
+    .from('votes')
+    .select('*')
+    .eq('chatId', chatId);
+  if (votesError) throw votesError;
 
   return Response.json(votes, { status: 200 });
 }
@@ -52,9 +65,12 @@ export async function PATCH(request: Request) {
     return new Response('messageId and type are required', { status: 400 });
   }
 
-  const chat = await getChatById({ id: chatId });
-
-  if (!chat) {
+  const { data: chat, error: chatError } = await supabase
+    .from('chats')
+    .select('*')
+    .eq('id', chatId)
+    .single();
+  if (chatError || !chat) {
     return new Response('Chat not found', { status: 404 });
   }
 
@@ -62,11 +78,17 @@ export async function PATCH(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  await voteMessage({
-    chatId,
-    messageId,
-    type: type,
-  });
+  // Upsert vote
+  const { error: voteError } = await supabase
+    .from('votes')
+    .upsert({
+      chatId,
+      messageId,
+      type,
+      userId: user.id,
+      updatedAt: new Date(),
+    });
+  if (voteError) throw voteError;
 
-  return new Response('Message voted', { status: 200 });
+  return new Response('Vote updated', { status: 200 });
 }

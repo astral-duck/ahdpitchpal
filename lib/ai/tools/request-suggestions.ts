@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import { DataStreamWriter, streamObject, tool } from 'ai';
-import { getDocumentById, saveSuggestions } from '@/lib/db/queries';
 import { Suggestion } from '@/lib/db/schema';
 import { generateUUID } from '@/lib/utils';
 import { myProvider } from '../providers';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface RequestSuggestionsProps {
   session: any;
@@ -22,9 +28,17 @@ export const requestSuggestions = ({
         .describe('The ID of the document to request edits'),
     }),
     execute: async ({ documentId }) => {
-      const document = await getDocumentById({ id: documentId });
-
-      if (!document || !document.content) {
+      const { data: documents, error: docError } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('id', documentId);
+      if (docError || !documents || documents.length === 0) {
+        return {
+          error: 'Document not found',
+        };
+      }
+      const document = documents[0];
+      if (!document.content) {
         return {
           error: 'Document not found',
         };
@@ -67,15 +81,15 @@ export const requestSuggestions = ({
 
       if (session.user?.id) {
         const userId = session.user.id;
-
-        await saveSuggestions({
-          suggestions: suggestions.map((suggestion) => ({
+        const now = new Date();
+        await supabase.from('suggestions').insert(
+          suggestions.map((suggestion) => ({
             ...suggestion,
             userId,
-            createdAt: new Date(),
+            createdAt: now,
             documentCreatedAt: document.createdAt,
-          })),
-        });
+          }))
+        );
       }
 
       return {

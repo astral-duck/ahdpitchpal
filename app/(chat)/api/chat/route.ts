@@ -7,12 +7,6 @@ import {
 } from 'ai';
 
 import {
-  deleteChatById,
-  getChatById,
-  saveChat,
-  saveMessages,
-} from '@/lib/db/queries';
-import {
   generateUUID,
   getMostRecentUserMessage,
   getTrailingMessageId,
@@ -25,6 +19,15 @@ import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
+import { systemPrompt } from '@/lib/ai/prompts';
+
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
@@ -55,22 +58,39 @@ export async function POST(request: Request) {
       return new Response('No user message found', { status: 400 });
     }
 
-    const chat = await getChatById({ id });
-
-    if (!chat) {
+    // Replace legacy getChatById
+    const { data: chat, error: chatError } = await supabase
+      .from('chats')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (chatError || !chat) {
       const title = await generateTitleFromUserMessage({
         message: userMessage,
       });
 
-      await saveChat({ id, userId: user.id, title });
+      // Replace legacy saveChat
+      const { data: newChat, error: newChatError } = await supabase
+        .from('chats')
+        .insert({
+          id,
+          userId: user.id,
+          title,
+        })
+        .single();
+      if (newChatError) {
+        throw newChatError;
+      }
     } else {
       if (chat.userId !== user.id) {
         return new Response('Unauthorized', { status: 401 });
       }
     }
 
-    await saveMessages({
-      messages: [
+    // Replace legacy saveMessages
+    const { data: newMessages, error: newMessagesError } = await supabase
+      .from('messages')
+      .insert([
         {
           chatId: id,
           id: userMessage.id,
@@ -79,8 +99,10 @@ export async function POST(request: Request) {
           attachments: userMessage.experimental_attachments ?? [],
           createdAt: new Date(),
         },
-      ],
-    });
+      ]);
+    if (newMessagesError) {
+      throw newMessagesError;
+    }
 
     return createDataStreamResponse({
       execute: (dataStream) => {
@@ -102,12 +124,9 @@ export async function POST(request: Request) {
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
-            createDocument: createDocument({ userId: user.id, dataStream }),
-            updateDocument: updateDocument({ userId: user.id, dataStream }),
-            requestSuggestions: requestSuggestions({
-              userId: user.id,
-              dataStream,
-            }),
+            createDocument: createDocument({ session: { user }, dataStream }),
+            updateDocument: updateDocument({ session: { user }, dataStream }),
+            requestSuggestions: requestSuggestions({ session: { user }, dataStream }),
           },
           onFinish: async ({ response }) => {
             if (user.id) {
@@ -127,8 +146,10 @@ export async function POST(request: Request) {
                   responseMessages: response.messages,
                 });
 
-                await saveMessages({
-                  messages: [
+                // Replace legacy saveMessages
+                const { data: savedAssistantMessage, error: savedAssistantMessageError } = await supabase
+                  .from('messages')
+                  .insert([
                     {
                       id: assistantId,
                       chatId: id,
@@ -138,8 +159,10 @@ export async function POST(request: Request) {
                         assistantMessage.experimental_attachments ?? [],
                       createdAt: new Date(),
                     },
-                  ],
-                });
+                  ]);
+                if (savedAssistantMessageError) {
+                  throw savedAssistantMessageError;
+                }
               } catch (_) {
                 console.error('Failed to save chat');
               }
@@ -184,13 +207,28 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const chat = await getChatById({ id });
+    // Replace legacy getChatById
+    const { data: chat, error: chatError } = await supabase
+      .from('chats')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (chatError || !chat) {
+      return new Response('Not found', { status: 404 });
+    }
 
     if (chat.userId !== user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    await deleteChatById({ id });
+    // Replace legacy deleteChatById
+    const { error: deleteChatError } = await supabase
+      .from('chats')
+      .delete()
+      .eq('id', id);
+    if (deleteChatError) {
+      throw deleteChatError;
+    }
 
     return new Response('Chat deleted', { status: 200 });
   } catch (error) {

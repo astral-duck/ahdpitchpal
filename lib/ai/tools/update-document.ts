@@ -1,7 +1,13 @@
 import { DataStreamWriter, tool } from 'ai';
 import { z } from 'zod';
-import { getDocumentById, saveDocument } from '@/lib/db/queries';
 import { documentHandlersByArtifactKind } from '@/lib/artifacts/server';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface UpdateDocumentProps {
   session: any;
@@ -18,13 +24,17 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
         .describe('The description of changes that need to be made'),
     }),
     execute: async ({ id, description }) => {
-      const document = await getDocumentById({ id });
-
-      if (!document) {
+      // Fetch document directly from Supabase
+      const { data: documents, error: docError } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('id', id);
+      if (docError || !documents || documents.length === 0) {
         return {
           error: 'Document not found',
         };
       }
+      const document = documents[0];
 
       dataStream.writeData({
         type: 'clear',
@@ -46,6 +56,9 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
         dataStream,
         session,
       });
+
+      // Save updated document to Supabase (if needed)
+      // await supabase.from('documents').update({ ... }).eq('id', id);
 
       dataStream.writeData({ type: 'finish', content: '' });
 

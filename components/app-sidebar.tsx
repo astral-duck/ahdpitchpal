@@ -27,14 +27,14 @@ export function AppSidebar({ user, loading }: { user: any | undefined, loading?:
         <SidebarMenu>
           <div className="flex flex-row justify-between items-center">
             <Link
-              href="/"
+              href="/admin"
               onClick={() => {
                 setOpenMobile(false);
               }}
               className="flex flex-row gap-3 items-center"
             >
-              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                Chatbot
+              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer" data-component-name="AppSidebar">
+                Pitch Pal
               </span>
             </Link>
             <Tooltip>
@@ -45,7 +45,7 @@ export function AppSidebar({ user, loading }: { user: any | undefined, loading?:
                   className="p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
-                    router.push('/');
+                    router.push("/");
                     router.refresh();
                   }}
                 >

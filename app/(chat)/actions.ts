@@ -2,14 +2,16 @@
 
 import { generateText, Message } from 'ai';
 import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
 
-import {
-  deleteMessagesByChatIdAfterTimestamp,
-  getMessageById,
-  updateChatVisiblityById,
-} from '@/lib/db/queries';
-import { VisibilityType } from '@/components/visibility-selector';
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 import { myProvider } from '@/lib/ai/providers';
+import { VisibilityType } from '@/components/visibility-selector';
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
@@ -35,12 +37,21 @@ export async function generateTitleFromUserMessage({
 }
 
 export async function deleteTrailingMessages({ id }: { id: string }) {
-  const [message] = await getMessageById({ id });
+  // Fetch the message
+  const { data: messages, error: messageError } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('id', id);
+  if (messageError || !messages || messages.length === 0) return;
+  const message = messages[0];
 
-  await deleteMessagesByChatIdAfterTimestamp({
-    chatId: message.chatId,
-    timestamp: message.createdAt,
-  });
+  // Delete all messages in the same chat after this message's createdAt
+  const { error: deleteError } = await supabase
+    .from('messages')
+    .delete()
+    .eq('chat_id', message.chat_id)
+    .gt('created_at', message.createdAt);
+  if (deleteError) throw deleteError;
 }
 
 export async function updateChatVisibility({
@@ -50,5 +61,9 @@ export async function updateChatVisibility({
   chatId: string;
   visibility: VisibilityType;
 }) {
-  await updateChatVisiblityById({ chatId, visibility });
+  const { error: updateError } = await supabase
+    .from('chats')
+    .update({ visibility })
+    .eq('id', chatId);
+  if (updateError) throw updateError;
 }

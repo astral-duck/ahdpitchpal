@@ -5,7 +5,13 @@ import { textDocumentHandler } from '@/artifacts/text/server';
 import { ArtifactKind } from '@/components/artifact';
 import { DataStreamWriter } from 'ai';
 import { Document } from '../db/schema';
-import { saveDocument } from '../db/queries';
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/database.types';
+
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export interface SaveDocumentProps {
   id: string;
@@ -51,12 +57,13 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
       });
 
       if (args.session?.user?.id) {
-        await saveDocument({
+        await supabase.from('documents').upsert({
           id: args.id,
           title: args.title,
           content: draftContent,
           kind: config.kind,
           userId: args.session.user.id,
+          updatedAt: new Date(),
         });
       }
 
@@ -71,12 +78,13 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
       });
 
       if (args.session?.user?.id) {
-        await saveDocument({
+        await supabase.from('documents').upsert({
           id: args.document.id,
           title: args.document.title,
           content: draftContent,
           kind: config.kind,
           userId: args.session.user.id,
+          updatedAt: new Date(),
         });
       }
 

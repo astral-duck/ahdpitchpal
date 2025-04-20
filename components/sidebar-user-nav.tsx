@@ -3,6 +3,8 @@ import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 import {
   DropdownMenu,
@@ -16,11 +18,24 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { supabase } from '@/lib/supabaseClient';
 
 export function SidebarUserNav({ user }: { user: any }) {
   const { setTheme, theme } = useTheme();
-  const isAdmin = user?.email === 'stevenjleipzig@gmail.com';
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      if (!user) return setIsAdmin(false);
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      setIsAdmin(!!data);
+    }
+    checkAdmin();
+  }, [user]);
 
   if (!user) {
     return (
@@ -62,15 +77,8 @@ export function SidebarUserNav({ user }: { user: any }) {
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/admin-dashboard">
-                <button
-                  type="button"
-                  className={`w-full text-left cursor-pointer ${
-                    isAdmin ? '' : 'opacity-50 pointer-events-none'
-                  }`}
-                >
-                  Admin Dashboard
-                </button>
+              <Link href="/admin" className={`w-full text-left ${isAdmin ? 'cursor-pointer' : 'opacity-50 pointer-events-none cursor-not-allowed'}`}>
+                Admin Dashboard
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

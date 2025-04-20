@@ -6,9 +6,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'Next.js Chatbot Template',
-  description: 'Next.js chatbot template using the AI SDK.',
+  metadataBase: new URL('https://ahdpitchpal.com'),
+  title: 'American Home Design - Pitch Pal',
+  description: 'Pitch Pal: AI Chatbot for American Home Design Sales Team',
 };
 
 export const viewport = {
@@ -63,6 +63,10 @@ export default async function RootLayout({
       className={`${geist.variable} ${geistMono.variable}`}
     >
       <head>
+        <title>American Home Design - Pitch Pal</title>
+        <meta name="description" content="Pitch Pal: AI Chatbot for American Home Design Sales Team" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/images/american-home-design-logo-square.jpg" type="image/jpeg" />
         <script
           dangerouslySetInnerHTML={{
             __html: THEME_COLOR_SCRIPT,

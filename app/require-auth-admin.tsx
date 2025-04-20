@@ -1,24 +1,47 @@
 "use client";
 import { useSupabaseUser } from "@/components/supabase-user-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-const ADMIN_EMAIL = "stevenjleipzig@gmail.com";
+import { useEffect, useState } from "react";
+import { supabase } from '@/lib/supabaseClient';
 
 export default function RequireAuthAdmin({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseUser();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      if (!user) {
+        setIsAdmin(false);
+        setChecking(false);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      setIsAdmin(!!data);
+      setChecking(false);
+    }
+    checkAdmin();
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
-    } else if (!loading && user && user.email !== ADMIN_EMAIL) {
+    } else if (!loading && !checking && !isAdmin) {
       router.replace("/");
     }
-  }, [user, loading, router]);
+  }, [user, loading, isAdmin, checking, router]);
 
-  if (loading || !user || user.email !== ADMIN_EMAIL) {
+  if (loading || checking || !user) {
     return <div className="p-8 text-center">Loading...</div>;
+  }
+  if (!isAdmin) {
+    return null;
   }
   return <>{children}</>;
 }

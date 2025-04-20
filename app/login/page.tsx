@@ -47,6 +47,10 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-md">
+        {/* Header with logo */}
+        <div className="flex justify-center mb-6">
+          <img src="/images/american-home-design-logo-main.jpg" alt="American Home Design Logo" className="h-12 object-contain" style={{maxWidth: '100%', maxHeight: '48px'}} />
+        </div>
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -59,11 +63,8 @@ export default function LoginPage() {
           }}
           theme="light"
           providers={[]}
-          view="sign_in" // Only show sign-in, hide sign-up
+          view="sign_in"
         />
-        <div className="mt-4 text-center">
-          <span className="inline-block px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">American Home Design Sales Portal</span>
-        </div>
       </div>
     </div>
   );
