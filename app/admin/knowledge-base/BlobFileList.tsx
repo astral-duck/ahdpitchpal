@@ -18,13 +18,24 @@ export default function BlobFileList({
   const [files, setFiles] = useState<BlobFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function fetchFiles() {
       setLoading(true);
-      const res = await fetch("/api/blob/list");
-      const data = await res.json();
-      setFiles(data.files);
+      try {
+        const res = await fetch("/api/blob/list");
+        const data = await res.json();
+        if (res.ok && Array.isArray(data.files)) {
+          setFiles(data.files);
+        } else {
+          setFiles([]); // fallback to empty array
+          // Optionally, set an error state to show a message
+        }
+      } catch (err) {
+        setFiles([]); // fallback to empty array on fetch error
+        // Optionally, set an error state to show a message
+      }
       setLoading(false);
     }
     fetchFiles();
@@ -36,16 +47,24 @@ export default function BlobFileList({
     setFiles((prev) => prev.filter((f) => f.key !== key));
   }
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleUpload() {
+    if (!selectedFile) return;
     setUploading(true);
-    await onUpload(file);
+    await onUpload(selectedFile);
     setUploading(false);
+    setSelectedFile(null);
     // Refresh list
-    const res = await fetch("/api/blob/list");
-    const data = await res.json();
-    setFiles(data.files);
+    try {
+      const res = await fetch("/api/blob/list");
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.files)) {
+        setFiles(data.files);
+      } else {
+        setFiles([]);
+      }
+    } catch (err) {
+      setFiles([]);
+    }
   }
 
   return (
@@ -55,9 +74,19 @@ export default function BlobFileList({
         <input
           type="file"
           accept=".txt,.pdf"
-          onChange={handleUpload}
+          onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
           disabled={uploading}
         />
+        <button
+          className="ml-2 px-3 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
+          onClick={handleUpload}
+          disabled={!selectedFile || uploading}
+        >
+          Upload
+        </button>
+        {selectedFile && !uploading && (
+          <span className="ml-2 text-gray-700">{selectedFile.name}</span>
+        )}
         {uploading && <span className="ml-2 text-gray-500">Uploading...</span>}
       </div>
       <h3 className="font-semibold mb-2">Blob Storage Files</h3>

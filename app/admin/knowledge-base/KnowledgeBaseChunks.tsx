@@ -1,6 +1,10 @@
-"use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+
+function normalizeFileName(name?: string): string | undefined {
+  if (!name) return undefined;
+  return name.trim().replace(/(\.txt)+$/i, ".txt").toLowerCase();
+}
 
 interface Chunk {
   id: string;
@@ -12,36 +16,57 @@ interface Chunk {
   flagged: boolean;
 }
 
-export default function KnowledgeBaseChunks({ fileName }: { fileName?: string }) {
+export default function KnowledgeBaseChunks() {
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFull, setShowFull] = useState<{ [id: string]: boolean }>({});
+  const [fileOptions, setFileOptions] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string>("");
 
   useEffect(() => {
     async function fetchChunks() {
       setLoading(true);
       let query = supabase
         .from("rag_chunks")
-        .select("id, file_name, chunk_index, content, citation, correction, flagged")
+        .select("*") // fetch all columns for debugging
+        .order("file_name", { ascending: true })
         .order("chunk_index", { ascending: true });
-      if (fileName) query = query.eq("file_name", fileName);
+      // REMOVE file filter for debugging
+      // if (selectedFile) query = query.eq("file_name", normalizeFileName(selectedFile));
       const { data, error } = await query;
+      console.log("Chunks data:", data, "Error:", error);
       if (data) setChunks(data);
       setLoading(false);
     }
     fetchChunks();
-  }, [fileName]);
+  }, []);
+
+  useEffect(() => {
+    async function fetchFileOptions() {
+      const { data, error } = await supabase
+        .from("rag_chunks")
+        .select("file_name")
+        .order("file_name", { ascending: true });
+      if (data) {
+        const uniqueFiles = Array.from(new Set(data.map((row: any) => normalizeFileName(row.file_name))));
+        setFileOptions(uniqueFiles);
+      }
+    }
+    fetchFileOptions();
+  }, []);
 
   if (loading) return <div>Loading chunks...</div>;
-  if (!chunks.length) return <div>No chunks found for this file.</div>;
+  if (!chunks.length) return <div>No chunks found.</div>;
 
   return (
-    <div className="mt-6">
-      <h3 className="text-lg font-semibold mb-2">Knowledge Chunks{fileName ? ` for ${fileName}` : ''}</h3>
+    <div className="mt-6 max-h-[600px] overflow-auto">
+      {/* File filter dropdown is hidden for now during debugging */}
+      <h3 className="text-lg font-semibold mb-2">Knowledge Chunks</h3>
       <table className="min-w-full border text-xs">
         <thead>
           <tr>
             <th className="border px-2 py-1">#</th>
+            <th className="border px-2 py-1">File</th>
             <th className="border px-2 py-1">Content</th>
             <th className="border px-2 py-1">Citation</th>
             <th className="border px-2 py-1">Correction</th>
@@ -49,9 +74,10 @@ export default function KnowledgeBaseChunks({ fileName }: { fileName?: string })
           </tr>
         </thead>
         <tbody>
-          {chunks.map((chunk) => (
+          {chunks.slice(0, 100).map((chunk) => (
             <tr key={chunk.id}>
               <td className="border px-2 py-1">{chunk.chunk_index}</td>
+              <td className="border px-2 py-1">{chunk.file_name}</td>
               <td className="border px-2 py-1 max-w-xs">
                 {showFull[chunk.id] ? (
                   <span className="whitespace-pre-wrap">{chunk.content}</span>
