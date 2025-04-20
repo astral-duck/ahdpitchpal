@@ -2,7 +2,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useUserRole } from "@/context/UserRoleContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const navLinks = [
@@ -18,16 +18,17 @@ const navLinks = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (loadingRole) return;
     if (role !== "admin") {
       // Only redirect if not already on an /admin page
-      if (!router.asPath.startsWith("/admin")) {
+      if (!pathname.startsWith("/admin")) {
         router.replace("/");
       }
     }
-  }, [role, loadingRole, router]);
+  }, [role, loadingRole, router, pathname]);
 
   if (loadingRole) return <div className="p-8 text-center">Loading...</div>;
   if (role !== "admin") return null;
