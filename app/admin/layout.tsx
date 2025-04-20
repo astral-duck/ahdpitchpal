@@ -20,8 +20,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    if (!loadingRole && role !== "admin") {
-      router.replace("/");
+    if (loadingRole) return;
+    if (role !== "admin") {
+      // Only redirect if not already on an /admin page
+      if (!router.asPath.startsWith("/admin")) {
+        router.replace("/");
+      }
     }
   }, [role, loadingRole, router]);
 
