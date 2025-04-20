@@ -6,9 +6,10 @@ import { ArtifactKind } from '@/components/artifact';
 import { DataStreamWriter } from 'ai';
 import { Document } from '../db/schema';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
 
-const supabase = createClient<Database>(
+// Removed legacy Database import. Using Supabase directly.
+
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );

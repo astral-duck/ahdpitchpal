@@ -2,9 +2,10 @@ import { DataStreamWriter, tool } from 'ai';
 import { z } from 'zod';
 import { documentHandlersByArtifactKind } from '@/lib/artifacts/server';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
 
-const supabase = createClient<Database>(
+// Removed legacy Database import. Using Supabase directly.
+
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );

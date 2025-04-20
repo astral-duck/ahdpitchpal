@@ -7,15 +7,15 @@ import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { DBMessage } from '@/lib/db/schema';
 import { Attachment, UIMessage } from 'ai';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
 
 // Initialize Supabase client (adjust URL/key as needed or use your existing client)
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 // TODO: Refactor this page to use Supabase Auth via context or client-side fetch. If you need user info, use useSupabaseUser() or pass user_id from client.
+// Removed legacy Database import. Using Supabase directly.
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;

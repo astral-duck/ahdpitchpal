@@ -1,10 +1,10 @@
 // TODO: Refactor this API to use Supabase Auth JWT from Authorization header or user_id in request body/query.
 
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
+// Removed legacy Database import. Using Supabase directly.
 import { verifySupabaseServerAuth } from '@/lib/verifySupabaseServer';
 
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );

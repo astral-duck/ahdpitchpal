@@ -1,13 +1,13 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
 
-const supabase = createClient<Database>(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 // This endpoint now expects the user id to be provided in a query param or header (since Supabase Auth is client-side only)
+// Removed legacy Database import. Using Supabase directly.
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
