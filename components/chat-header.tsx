@@ -72,12 +72,19 @@ function PureChatHeader({
         />
       )}
 
-      {/* Admin Dashboard Button (styled as previous Vercel button) */}
+      {/* Admin Dashboard Button (fixed top right for admin) */}
       {role === "admin" && !isReadonly && !loadingRole && (
         <Button
           variant="outline"
-          className="order-3 md:order-4 md:px-2 px-2 md:h-fit ml-2"
+          style={{
+            position: "fixed",
+            top: "16px",
+            right: "24px",
+            zIndex: 50
+          }}
+          className="md:px-2 px-2 md:h-fit ml-2"
           onClick={() => router.push('/admin')}
+          data-component-name="_c"
         >
           <span>Admin Dashboard</span>
         </Button>
