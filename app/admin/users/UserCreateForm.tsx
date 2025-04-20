@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function UserCreateForm({ onUserCreated }: { onUserCreated?: () => void }) {
   const [email, setEmail] = useState("");
@@ -15,28 +14,25 @@ export default function UserCreateForm({ onUserCreated }: { onUserCreated?: () =
     setLoading(true);
     setError(null);
     setSuccess(false);
-    // Create user via Supabase admin API
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      user_metadata: { role },
+    // Create user via secure API route
+    const res = await fetch("/api/create-user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, role }),
     });
-    if (error) {
-      setError(error.message);
+    const result = await res.json();
+    console.log("User creation result:", result);
+    if (!res.ok) {
+      setError(
+        (typeof result.error === "string" ? result.error : JSON.stringify(result)) ||
+        "Failed to create user"
+      );
     } else {
-      // Add user role to user_roles table
-      const { error: roleError } = await supabase.from("user_roles").insert([
-        { user_id: data.user.id, role },
-      ]);
-      if (roleError) {
-        setError("User created, but failed to assign role: " + roleError.message);
-      } else {
-        setSuccess(true);
-        setEmail("");
-        setPassword("");
-        setRole("user");
-        if (onUserCreated) onUserCreated();
-      }
+      setSuccess(true);
+      setEmail("");
+      setPassword("");
+      setRole("user");
+      if (onUserCreated) onUserCreated();
     }
     setLoading(false);
   }
@@ -49,7 +45,7 @@ export default function UserCreateForm({ onUserCreated }: { onUserCreated?: () =
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="border px-2 py-1 mr-2 mb-2"
+        className="border px-2 py-1 mr-2 mb-2 bg-white text-black dark:bg-gray-800 dark:text-white"
         required
       />
       <input
@@ -57,10 +53,10 @@ export default function UserCreateForm({ onUserCreated }: { onUserCreated?: () =
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border px-2 py-1 mr-2 mb-2"
+        className="border px-2 py-1 mr-2 mb-2 bg-white text-black dark:bg-gray-800 dark:text-white"
         required
       />
-      <select value={role} onChange={(e) => setRole(e.target.value)} className="border px-2 py-1 mr-2 mb-2">
+      <select value={role} onChange={(e) => setRole(e.target.value)} className="border px-2 py-1 mr-2 mb-2 bg-white text-black dark:bg-gray-800 dark:text-white">
         <option value="user">User</option>
         <option value="admin">Admin</option>
       </select>

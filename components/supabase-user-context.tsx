@@ -15,15 +15,37 @@ export function SupabaseUserProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let ignore = false;
+    // Try to restore user from sessionStorage if available
+    const storedUser = typeof window !== 'undefined' ? window.sessionStorage.getItem('supabaseUser') : null;
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setLoading(false);
+    }
     supabase.auth.getUser().then(({ data, error }) => {
       if (!ignore) {
         setUser(data?.user || null);
         setLoading(false);
+        // Persist user in sessionStorage
+        if (typeof window !== 'undefined') {
+          if (data?.user) {
+            window.sessionStorage.setItem('supabaseUser', JSON.stringify(data.user));
+          } else {
+            window.sessionStorage.removeItem('supabaseUser');
+          }
+        }
       }
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
       setLoading(false);
+      // Persist user in sessionStorage
+      if (typeof window !== 'undefined') {
+        if (session?.user) {
+          window.sessionStorage.setItem('supabaseUser', JSON.stringify(session.user));
+        } else {
+          window.sessionStorage.removeItem('supabaseUser');
+        }
+      }
     });
     return () => {
       ignore = true;

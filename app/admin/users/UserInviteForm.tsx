@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function UserInviteForm({ onInviteSent }: { onInviteSent?: () => void }) {
   const [email, setEmail] = useState("");
@@ -15,34 +14,20 @@ export default function UserInviteForm({ onInviteSent }: { onInviteSent?: () => 
     setError(null);
     setSuccess(false);
     setInviteLink(null);
-    // Send invite (password setup) email
-    const { error: inviteError } = await supabase.auth.api.resetPasswordForEmail(email);
-    if (inviteError) {
-      setError(inviteError.message);
+    // Call new API route
+    const res = await fetch("/api/invite-user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      setError(result.error || "Failed to send invite");
     } else {
-      // Look up user by email
-      const { data: userLookup, error: lookupError } = await supabase.auth.admin.listUsers();
-      if (lookupError) {
-        setError('Invite sent, but failed to lookup user for role assignment: ' + lookupError.message);
-      } else {
-        const user = userLookup.users.find((u: any) => u.email === email);
-        if (user) {
-          // Insert role if not already present
-          const { error: roleError } = await supabase.from("user_roles").upsert([
-            { user_id: user.id, role: "user" },
-          ], { onConflict: ["user_id"] });
-          if (roleError) {
-            setError('Invite sent, but failed to assign role: ' + roleError.message);
-          } else {
-            setSuccess(true);
-            setInviteLink(`A password setup link has been sent to ${email}.`);
-            setEmail("");
-            if (onInviteSent) onInviteSent();
-          }
-        } else {
-          setError('Invite sent, but user not found yet. Role will need to be assigned after signup.');
-        }
-      }
+      setSuccess(true);
+      setInviteLink(`A password setup link has been sent to ${email}.`);
+      setEmail("");
+      if (onInviteSent) onInviteSent();
     }
     setLoading(false);
   }
@@ -60,13 +45,13 @@ export default function UserInviteForm({ onInviteSent }: { onInviteSent?: () => 
       />
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-1 rounded"
         disabled={loading}
+        className="bg-blue-600 text-white px-4 py-1 rounded"
       >
         {loading ? "Sending..." : "Send Invite"}
       </button>
-      {error && <div className="text-red-600 mt-2">{error}</div>}
-      {inviteLink && <div className="text-green-600 mt-2">{inviteLink}</div>}
+      {error && <div className="text-red-500 mt-2">{error}</div>}
+      {success && inviteLink && <div className="text-green-600 mt-2">{inviteLink}</div>}
     </form>
   );
 }
