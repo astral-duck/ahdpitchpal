@@ -99,7 +99,8 @@ export function SidebarHistory({ user }: { user: any }) {
   // You can now use user.id to fetch chat history, e.g. pass user_id to API
   // (Implementation of fetching chat history using Supabase user is assumed elsewhere)
   const { setOpenMobile } = useSidebar();
-  const { id } = useParams();
+  const params = useParams();
+  const id = typeof params === 'object' && params !== null && 'id' in params ? params.id : undefined;
 
   const userId = user?.id;
 

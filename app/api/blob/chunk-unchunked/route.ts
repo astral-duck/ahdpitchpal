@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
       console.error("[chunk-unchunked] Supabase error:", err1);
       return NextResponse.json({ success: false, error: err1.message }, { status: 500 });
     }
-    const chunkedFiles = chunked ? [...new Set(chunked.map(f => f.file_name))] : [];
+    const chunkedFiles = chunked ? [...new Set(chunked.map((f: { file_name: string }) => f.file_name))] : [];
     // 3. Find unchunked files by file_name
-    const unchunkedBlobs = files.filter(f => !chunkedFiles.includes(f.key.split("-")[0] + ".txt"));
+    const unchunkedBlobs = files.filter((f: { key: string }) => !chunkedFiles.includes(f.key.split("-")[0] + ".txt"));
     let results = [];
     for (const blob of unchunkedBlobs) {
       const fileName = blob.key.split("-")[0] + ".txt"; // for display/metadata

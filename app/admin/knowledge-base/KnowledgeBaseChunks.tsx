@@ -48,7 +48,14 @@ export default function KnowledgeBaseChunks() {
         .select("file_name")
         .order("file_name", { ascending: true });
       if (data) {
-        const uniqueFiles = Array.from(new Set(data.map((row: any) => normalizeFileName(row.file_name))));
+        // Filter out undefined/null file names and ensure unique, non-empty strings
+        const uniqueFiles = Array.from(
+          new Set(
+            data
+              .map((row: any) => normalizeFileName(row.file_name))
+              .filter((name): name is string => !!name && typeof name === "string")
+          )
+        );
         setFileOptions(uniqueFiles);
       }
     }

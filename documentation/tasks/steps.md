@@ -24,7 +24,7 @@
 - [x] Hamburger menu for user chat history
 
 ## Step 5: Feedback, Flagging, & Training
-- [] Feedback/flag function on answers (required comment)
+- [ ] Feedback/flag function on answers (required comment)
 - [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo)
 - [ ] Admin training interface: review/correct answers, save corrections to RAG table
 
@@ -36,11 +36,12 @@
 - [x] Connect dashboard to Supabase for:
     - Feedback review (flagged answers, user info, full convo)
     - Chat History (admin can select user, view full history)
-    - Dashboard analytics (total chats, tokens in/out, API cost, feedback logs, FAQ table, usage ranking, pending invites)
     - Chatbot instructions/personality editing (Settings)
     - Training/corrections management
     - API connection status (Supabase, Blob, Vercel, xAI, OpenAI)
 - [x] Ensure admin-only access via UserRoleContext
+- [x] Fixed admin reload: reload on /admin pages no longer redirects to chatbot
+- [x] Updated analytics section to Chat History as per latest requirements
 - [ ] Replace all sample/stat placeholder data with live data from Supabase and blob storage
 - [ ] Polish UI for branding and mobile responsiveness
 
@@ -48,6 +49,29 @@
 - [ ] E2E tests (Playwright)
 - [ ] Final QA, bugfixes
 - [ ] Deploy to Vercel (ahdpitchpal.com)
+
+---
+
+# Next Steps / Suggestions
+
+- [ ] Implement feedback/flagging on answers for users (with required comment)
+- [ ] Build admin dashboard view for flagged responses (with filters/search)
+- [ ] Enhance training interface for admins to review/correct answers and update RAG table
+- [ ] UI/UX polish for admin dashboard and chat history
+- [ ] (When ready) Integrate live xAI billing API for real-time usage/cost tracking
+- [ ] Add notifications or logs for admin actions (user creation, file uploads, etc)
+
+---
+
+**What would you like to tackle next?**
+- Feedback/flagging system
+- Flagged response admin view
+- Training/corrections UI
+- UI/UX polish
+- xAI billing integration (when ready)
+- Something else?
+
+Let me know your priority or if you want a suggestion!
 
 ---
 

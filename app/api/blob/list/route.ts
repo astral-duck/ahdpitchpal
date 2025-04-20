@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const files = blobs.map((blob) => ({
       key: blob.pathname,
       size: blob.size,
-      contentType: blob.contentType,
+      contentType: (blob as any).contentType || (blob as any).content_type || "",
       lastModified: blob.uploadedAt,
       url: blob.url,
     }));

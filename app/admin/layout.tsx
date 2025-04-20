@@ -6,11 +6,12 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const navLinks = [
+  { label: "Home", href: "/chat" },
   { label: "Dashboard", href: "/admin" },
   { label: "Users", href: "/admin/users" },
   { label: "Knowledge Base", href: "/admin/knowledge-base" },
   { label: "Feedback", href: "/admin/feedback" },
-  { label: "Analytics", href: "/admin/analytics" },
+  { label: "Chat History", href: "/admin/analytics" },
   { label: "Settings", href: "/admin/settings" },
   { label: "Training", href: "/admin/training" },
 ];
@@ -24,7 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (loadingRole) return;
     if (role !== "admin") {
       // Only redirect if not already on an /admin page
-      if (!pathname.startsWith("/admin")) {
+      if (!pathname?.startsWith("/admin")) {
         router.replace("/");
       }
     }
