@@ -55,7 +55,6 @@ export default function LoginPage() {
           supabaseClient={supabase}
           appearance={{
             theme: ThemeSupa,
-            variables: customTheme.default,
             style: {
               button: { backgroundColor: "#004b91", color: "#fff", fontWeight: 600 },
               anchor: { color: "#004b91", fontWeight: 500 },
