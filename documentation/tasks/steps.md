@@ -7,15 +7,15 @@
 
 ## Step 2: Authentication & User Management (Supabase)
 - [x] Integrate Supabase Auth, disable self-signup
-- [ ] Custom admin dashboard for user creation/removal (Supabase). Access only for admin role via main navigation.
-- [ ] Password reset for admin and users (Supabase email reset flow)
+- [x] Custom admin dashboard for user creation/removal (Supabase). Access only for admin role via main navigation.
+- [x] Password reset for admin and users (Supabase email reset flow)
 
 ## Step 3: Knowledge Base Integration
 - [x] Knowledge base upload (admin dashboard, .txt files)
 - [x] Store docs in Vercel Blob
-- [ ] Chunk uploaded files and insert into Supabase `rag_chunks` table with embeddings
-- [ ] RAG pipeline for chatbot (strict to knowledge base)
-- [ ] Citations/sources in responses
+- [x] Chunk uploaded files and insert into Supabase `rag_chunks` table with embeddings
+- [x] RAG pipeline for chatbot (strict to knowledge base)
+- [x] Citations/sources in responses
 
 ## Step 4: Chatbot & Chat History
 - [x] Integrate Grok via AI SDK
@@ -24,7 +24,7 @@
 - [x] Hamburger menu for user chat history
 
 ## Step 5: Feedback, Flagging, & Training
-- [ ] Feedback/flag function on answers (required comment)
+- [] Feedback/flag function on answers (required comment)
 - [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo)
 - [ ] Admin training interface: review/correct answers, save corrections to RAG table
 
@@ -33,11 +33,13 @@
 - [x] Connected dashboard to Supabase for:
     - User management (list, create, remove users)
     - Knowledge base management (upload .txt, view/manage docs in blob)
-- [ ] Connect dashboard to Supabase for:
+- [x] Connect dashboard to Supabase for:
     - Feedback review (flagged answers, user info, full convo)
-    - Analytics (top 5 FAQs, usage stats, total conversations, total requests, tokens in/out, monthly cost)
-    - Chatbot instructions/personality editing
+    - Chat History (admin can select user, view full history)
+    - Dashboard analytics (total chats, tokens in/out, API cost, feedback logs, FAQ table, usage ranking, pending invites)
+    - Chatbot instructions/personality editing (Settings)
     - Training/corrections management
+    - API connection status (Supabase, Blob, Vercel, xAI, OpenAI)
 - [x] Ensure admin-only access via UserRoleContext
 - [ ] Replace all sample/stat placeholder data with live data from Supabase and blob storage
 - [ ] Polish UI for branding and mobile responsiveness
@@ -49,4 +51,4 @@
 
 ---
 
-_Last updated: 2025-04-19_
+_Last updated: 2025-04-20_

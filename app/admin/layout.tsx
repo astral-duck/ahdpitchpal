@@ -29,16 +29,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (role !== "admin") return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-background text-foreground transition-colors">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white flex flex-col p-4 min-h-screen">
+      <aside className="w-64 bg-sidebar-background text-sidebar-foreground flex flex-col p-4 min-h-screen border-r border-sidebar-border">
         <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
         <nav className="flex flex-col gap-2">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="px-3 py-2 rounded hover:bg-gray-700"
+              className="px-3 py-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
               prefetch={false}
             >
               {link.label}
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
       </aside>
       {/* Main Content */}
-      <main className="flex-1 bg-gray-900 p-8 text-white">
+      <main className="flex-1 bg-background p-8 text-foreground transition-colors">
         {children}
       </main>
     </div>
