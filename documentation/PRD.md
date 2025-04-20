@@ -11,7 +11,7 @@ Pitch Pal is a secure, mobile-first AI chatbot for American Home Design salespeo
 - **Chatbot:** Uses Grok (xAI) via AI SDK, strictly limited to knowledge base for answers, with math and image interpolation. Friendly, sales-focused personality (Pitch Pal). Citations/sources included in responses.
 - **Chat History:** Persistent per user, visible in hamburger menu. Admin can view all users’ chat histories via dashboard.
 - **Feedback:** Users can flag answers with required comments. Admin dashboard shows flagged feedback with user, timestamp, original Q&A, and full conversation.
-- **Admin Dashboard:** Manage users (Supabase), reset passwords, upload/manage knowledge base, view chats/feedback, adjust Grok settings, see analytics (top 5 FAQs, usage stats).
+- **Admin Dashboard:** Manage users (Supabase), reset passwords, upload/manage knowledge base, view chats/feedback, adjust Grok settings, see analytics (top 5 FAQs, usage stats). Only visible to users with the admin role. Accessible via top navigation button when authenticated as admin.
 - **Branding:** Custom logos and colors as provided. Pitch Pal avatar for chatbot, user avatar is first initial.
 - **UI:** Minimal, mobile-first. Login → full-screen chat. Simple navigation.
 - **File Storage:** Vercel Blob for attachments and knowledge docs.

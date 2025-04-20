@@ -12,6 +12,7 @@ export default function RequireAuthAdmin({ children }: { children: React.ReactNo
 
   useEffect(() => {
     async function checkAdmin() {
+      console.log("[RequireAuthAdmin] Checking admin role for user:", user);
       if (!user) {
         setIsAdmin(false);
         setChecking(false);
@@ -23,6 +24,7 @@ export default function RequireAuthAdmin({ children }: { children: React.ReactNo
         .eq('user_id', user.id)
         .eq('role', 'admin')
         .single();
+      console.log("[RequireAuthAdmin] Supabase admin check result:", { data, error });
       setIsAdmin(!!data);
       setChecking(false);
     }

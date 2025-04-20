@@ -7,7 +7,7 @@
 
 ## Step 2: Authentication & User Management (Supabase)
 - [x] Integrate Supabase Auth, disable self-signup
-- [ ] Custom admin dashboard for user creation/removal (Supabase)
+- [ ] Custom admin dashboard for user creation/removal (Supabase). Access only for admin role via main navigation.
 - [ ] Password reset for admin and users (Supabase email reset flow)
 
 ## Step 3: Knowledge Base Integration
@@ -24,7 +24,7 @@
 
 ## Step 5: Feedback & Flagging
 - [ ] Feedback/flag function on answers (required comment)
-- [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo)
+- [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo). Only visible to admin role via main navigation.
 
 ## Step 6: Admin Dashboard
 - [ ] Manage users (Supabase), knowledge base, feedback, Grok settings

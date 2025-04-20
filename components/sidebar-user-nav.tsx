@@ -2,7 +2,6 @@
 import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -18,9 +17,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useUserRole } from "@/context/UserRoleContext";
 
 export function SidebarUserNav({ user }: { user: any }) {
   const { setTheme, theme } = useTheme();
+  const { role, loadingRole } = useUserRole();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -51,6 +52,8 @@ export function SidebarUserNav({ user }: { user: any }) {
 
   return (
     <SidebarMenu>
+      {/* Admin Dashboard button at the top right if admin */}
+      {/* Removed per user request: this button is now in ChatHeader */}
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -75,11 +78,6 @@ export function SidebarUserNav({ user }: { user: any }) {
               onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
               {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/admin" className={`w-full text-left ${isAdmin ? 'cursor-pointer' : 'opacity-50 pointer-events-none cursor-not-allowed'}`}>
-                Admin Dashboard
-              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
