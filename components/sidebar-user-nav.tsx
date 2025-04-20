@@ -73,12 +73,7 @@ export function SidebarUserNav({ user }: { user: any }) {
             side="top"
             className="w-[--radix-popper-anchor-width]"
           >
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onSelect={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              {`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
-            </DropdownMenuItem>
+            {/* Removed theme toggle per user request */}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <button
