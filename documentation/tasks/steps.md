@@ -11,8 +11,9 @@
 - [ ] Password reset for admin and users (Supabase email reset flow)
 
 ## Step 3: Knowledge Base Integration
-- [ ] Knowledge base upload (admin dashboard, .txt files)
-- [ ] Store docs in Vercel Blob
+- [x] Knowledge base upload (admin dashboard, .txt files)
+- [x] Store docs in Vercel Blob
+- [ ] Chunk uploaded files and insert into Supabase `rag_chunks` table with embeddings
 - [ ] RAG pipeline for chatbot (strict to knowledge base)
 - [ ] Citations/sources in responses
 
@@ -22,16 +23,24 @@
 - [x] Persistent chat history (user & admin views, via Supabase user ID)
 - [x] Hamburger menu for user chat history
 
-## Step 5: Feedback & Flagging
+## Step 5: Feedback, Flagging, & Training
 - [ ] Feedback/flag function on answers (required comment)
-- [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo). Only visible to admin role via main navigation.
+- [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo)
+- [ ] Admin training interface: review/correct answers, save corrections to RAG table
 
-## Step 6: Admin Dashboard
-- [ ] Manage users (Supabase), knowledge base, feedback, Grok settings
-- [ ] Analytics: top 5 FAQs, usage stats, total conversations, total requests, tokens in/out, monthly cost (by month)
-- [ ] Analytics homescreen: summary cards for conversations, requests, tokens, cost (monthly)
-- [ ] Analytics homescreen: top 5 FAQs
-- [ ] Analytics homescreen: feedback panel
+## Step 6: Admin Dashboard Integration
+- [x] Scaffolded nextjs-dashboard template into /app/admin, replacing placeholder UI
+- [x] Connected dashboard to Supabase for:
+    - User management (list, create, remove users)
+    - Knowledge base management (upload .txt, view/manage docs in blob)
+- [ ] Connect dashboard to Supabase for:
+    - Feedback review (flagged answers, user info, full convo)
+    - Analytics (top 5 FAQs, usage stats, total conversations, total requests, tokens in/out, monthly cost)
+    - Chatbot instructions/personality editing
+    - Training/corrections management
+- [x] Ensure admin-only access via UserRoleContext
+- [ ] Replace all sample/stat placeholder data with live data from Supabase and blob storage
+- [ ] Polish UI for branding and mobile responsiveness
 
 ## Step 7: Testing & Launch
 - [ ] E2E tests (Playwright)

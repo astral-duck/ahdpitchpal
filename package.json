@@ -3,7 +3,7 @@
   "version": "3.0.3",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "cross-env NEXT_PRIVATE_DEV_SERVER_WEBPACK=true next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
@@ -95,6 +95,7 @@
     "@types/pdf-parse": "^1.1.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cross-env": "^7.0.3",
     "drizzle-kit": "^0.25.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",
