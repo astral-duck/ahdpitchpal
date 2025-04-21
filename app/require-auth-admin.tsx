@@ -2,7 +2,9 @@
 import { useSupabaseUser } from "@/components/supabase-user-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from '@/lib/supabaseClient';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+const supabase = createClientComponentClient();
 
 export default function RequireAuthAdmin({ children }: { children: React.ReactNode }) {
   const { user, loading } = useSupabaseUser();

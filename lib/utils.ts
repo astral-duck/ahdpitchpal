@@ -59,8 +59,8 @@ function addToolMessageToChat({
   messages,
 }: {
   toolMessage: CoreToolMessage;
-  messages: Array<Message>;
-}): Array<Message> {
+  messages: Array<Message | CoreToolMessage>;
+}): Array<Message | CoreToolMessage> {
   return messages.map((message) => {
     if (message.toolInvocations) {
       return {

@@ -2,7 +2,9 @@
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+const supabase = createClientComponentClient();
 
 // xAI Grok models and pricing (per 1M tokens, USD)
 const XAI_MODELS = [

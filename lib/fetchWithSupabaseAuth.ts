@@ -1,4 +1,6 @@
-import { supabase } from './supabaseClient';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+const supabase = createClientComponentClient();
 
 /**
  * Fetch wrapper that automatically adds the Supabase access token to the Authorization header.

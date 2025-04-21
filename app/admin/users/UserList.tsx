@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
+const supabase = createClientComponentClient();
 
 interface User {
   id: string;
@@ -49,13 +51,12 @@ export default function UserList({ onDelete }: { onDelete?: () => void }) {
       setLoading(false);
     }
     fetchUsers();
-  }, []);
+  }, [onDelete]);
 
   async function handleDelete(userId: string) {
     if (!window.confirm("Are you sure you want to delete this user? This cannot be undone.")) return;
     setDeleting(userId);
     setError(null);
-    // Call Supabase Admin API to delete user (should be via a server-side API route in production)
     const { error } = await supabase.auth.admin.deleteUser(userId);
     if (error) {
       setError(error.message || "Failed to delete user.");

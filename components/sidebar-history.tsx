@@ -81,18 +81,21 @@ export function getChatHistoryPaginationKey(
   previousPageData: ChatHistory,
   userId?: string
 ) {
+  // Only generate a key if userId is present (user is authenticated)
   if (!userId) return null;
   if (previousPageData && previousPageData.hasMore === false) {
     return null;
   }
 
-  if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}&user_id=${userId}`;
+  // The backend uses the authenticated user from the JWT, not the user_id query param.
+  // So we do NOT need to send user_id in the query string.
+  if (pageIndex === 0) return `/api/history?limit=${PAGE_SIZE}`;
 
   const firstChatFromPage = previousPageData.chats.at(-1);
 
   if (!firstChatFromPage) return null;
 
-  return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}&user_id=${userId}`;
+  return `/api/history?ending_before=${firstChatFromPage.id}&limit=${PAGE_SIZE}`;
 }
 
 export function SidebarHistory({ user }: { user: any }) {

@@ -1,7 +1,9 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useSupabaseUser } from "@/components/supabase-user-context";
+
+const supabase = createClientComponentClient();
 
 interface UserRoleContextType {
   role: string | null;

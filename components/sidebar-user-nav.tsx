@@ -3,8 +3,7 @@ import { ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +17,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useUserRole } from "@/context/UserRoleContext";
+
+const supabase = createClientComponentClient();
 
 export function SidebarUserNav({ user }: { user: any }) {
   const { setTheme, theme } = useTheme();
