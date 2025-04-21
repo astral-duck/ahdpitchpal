@@ -1,9 +1,9 @@
 "use client";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 
-export default function AdminFeedbackPage() {
+export default function AdminFeedbackPage({ params }: { params?: Promise<any> }) {
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
 

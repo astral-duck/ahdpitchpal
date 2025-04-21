@@ -5,7 +5,7 @@ import { DataStreamHandler } from '@/components/data-stream-handler';
 import { useChatbotSettings } from '@/components/chatbot-settings-context';
 import { useSupabaseUser } from '@/components/supabase-user-context';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -13,11 +13,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function Page({ params }: { params: { id: string } }) {
-  // Unwrap params using React.use() for Next.js compatibility
-  // (for now, still support direct access for migration, but future-proof)
-  // See: https://nextjs.org/docs/messages/params-promise
-  const id = typeof params === 'object' && params !== null && 'id' in params ? params.id : undefined;
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const { model } = useChatbotSettings();
   const { user, loading } = useSupabaseUser();
   const router = useRouter();

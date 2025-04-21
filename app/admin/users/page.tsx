@@ -1,12 +1,13 @@
 "use client";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import UserList from "./UserList";
 import UserCreateForm from "./UserCreateForm";
 import UserInviteForm from "./UserInviteForm";
 
-export default function AdminUsersPage() {
+export default function AdminUsersPage({ params }: { params?: Promise<any> }) {
+  // If you need params, use: const { id } = params ? use(params) : {};
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
   const [refresh, setRefresh] = useState(0);

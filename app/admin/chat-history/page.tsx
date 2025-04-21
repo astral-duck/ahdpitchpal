@@ -1,12 +1,13 @@
 "use client";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 import dynamic from "next/dynamic";
 
 const AdminChatHistory = dynamic(() => import("../chat-history"), { ssr: false });
 
-export default function AdminChatHistoryPage() {
+export default function AdminChatHistoryPage({ params }: { params?: Promise<any> }) {
+  // If you need params, use: const { id } = params ? use(params) : {};
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
 

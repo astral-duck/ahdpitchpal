@@ -1,7 +1,7 @@
 "use client";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const supabase = createClientComponentClient();
@@ -14,7 +14,8 @@ interface Correction {
   created_at: string;
 }
 
-export default function AdminTrainingPage() {
+export default function AdminTrainingPage({ params }: { params?: Promise<any> }) {
+  // If you need params, use: const { id } = params ? use(params) : {};
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
   const [corrections, setCorrections] = useState<Correction[]>([]);

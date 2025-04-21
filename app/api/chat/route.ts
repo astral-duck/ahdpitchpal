@@ -59,9 +59,43 @@ export async function POST(request: Request) {
       return new Response('No user message found', { status: 400 });
     }
 
-    // ... rest of the POST handler logic ...
+    // 1. Fetch chatbot settings from Supabase
+    const { data: settings, error: settingsError } = await supabase
+      .from('chatbot_settings')
+      .select('instructions, model')
+      .eq('id', 1)
+      .single();
+    if (settingsError || !settings) {
+      return new Response('Failed to fetch chatbot settings', { status: 500 });
+    }
 
-    return new Response('OK', { status: 200 }); // Placeholder
+    // 2. Retrieve relevant RAG context from rag_chunks (simple keyword search for demo)
+    const query = userMessage.content;
+    let ragContext = '';
+    const { data: ragChunks, error: ragError } = await supabase
+      .from('rag_chunks')
+      .select('content')
+      .ilike('content', `%${query.split(' ')[0] || ''}%`)
+      .limit(5);
+    if (!ragError && ragChunks && ragChunks.length > 0) {
+      ragContext = ragChunks.map((chunk: any) => chunk.content).join('\n---\n');
+    }
+
+    // 3. Construct system prompt
+    const sysPrompt = [
+      settings.instructions,
+      ragContext ? `Knowledge Base:\n${ragContext}` : '',
+    ].filter(Boolean).join('\n\n');
+
+    // 4. Call the LLM (xAI/Grok) and stream response
+    const stream = await streamText({
+      model: myProvider.languageModel(settings.model || selectedChatModel || 'chat-model'),
+      system: sysPrompt,
+      prompt: userMessage.content,
+      messages,
+      maxTokens: 512,
+    });
+    return createDataStreamResponse(smoothStream(stream));
   } catch (err) {
     return new Response('Internal Server Error', { status: 500 });
   }

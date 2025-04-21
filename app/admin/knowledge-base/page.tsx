@@ -1,11 +1,12 @@
 "use client";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import BlobFileList from "./BlobFileList";
 import KnowledgeBaseChunks from "./KnowledgeBaseChunks";
 
-export default function AdminKnowledgeBasePage() {
+export default function AdminKnowledgeBasePage({ params }: { params?: Promise<any> }) {
+  // If you need params, use: const { id } = params ? use(params) : {};
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<string | undefined>(undefined);
