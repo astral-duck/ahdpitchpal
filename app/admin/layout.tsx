@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { ChatbotSettingsProvider } from "@/components/chatbot-settings-context";
 
 const navLinks = [
   { label: "Home", href: "/chat" },
@@ -11,7 +12,7 @@ const navLinks = [
   { label: "Users", href: "/admin/users" },
   { label: "Knowledge Base", href: "/admin/knowledge-base" },
   { label: "Feedback", href: "/admin/feedback" },
-  { label: "Chat History", href: "/admin/analytics" },
+  { label: "Chat History", href: "/admin/chat-history" },
   { label: "Settings", href: "/admin/settings" },
   { label: "Training", href: "/admin/training" },
 ];
@@ -35,27 +36,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (role !== "admin") return null;
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground transition-colors">
-      {/* Sidebar */}
-      <aside className="w-64 bg-sidebar-background text-sidebar-foreground flex flex-col p-4 min-h-screen border-r border-sidebar-border">
-        <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
-        <nav className="flex flex-col gap-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="px-3 py-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-              prefetch={false}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </aside>
-      {/* Main Content */}
-      <main className="flex-1 bg-background p-8 text-foreground transition-colors">
-        {children}
-      </main>
-    </div>
+    <ChatbotSettingsProvider>
+      <div className="flex min-h-screen bg-background text-foreground transition-colors">
+        {/* Sidebar */}
+        <aside className="w-64 bg-sidebar-background text-sidebar-foreground flex flex-col p-4 min-h-screen border-r border-sidebar-border">
+          <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
+          <nav className="flex flex-col gap-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-3 py-2 rounded hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                prefetch={false}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </aside>
+        {/* Main Content */}
+        <main className="flex-1 bg-background p-8 text-foreground transition-colors">
+          {children}
+        </main>
+      </div>
+    </ChatbotSettingsProvider>
   );
 }

@@ -2,8 +2,11 @@
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 
-export default function AdminAnalyticsPage() {
+const AdminChatHistory = dynamic(() => import("../chat-history"), { ssr: false });
+
+export default function AdminChatHistoryPage() {
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
 
@@ -18,8 +21,8 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Analytics</h2>
-      <div className="text-gray-500">(Coming soon: Usage stats, top FAQs, tokens, cost, and more)</div>
+      <h2 className="text-2xl font-bold mb-4">Chat History</h2>
+      <AdminChatHistory />
     </div>
   );
 }

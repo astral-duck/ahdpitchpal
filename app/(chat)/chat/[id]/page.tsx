@@ -1,85 +1,83 @@
-import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+"use client";
 
 import { Chat } from '@/components/chat';
 import { DataStreamHandler } from '@/components/data-stream-handler';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { DBMessage } from '@/lib/db/schema';
-import { Attachment, UIMessage } from 'ai';
+import { useChatbotSettings } from '@/components/chatbot-settings-context';
+import { useSupabaseUser } from '@/components/supabase-user-context';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client (adjust URL/key as needed or use your existing client)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// TODO: Refactor this page to use Supabase Auth via context or client-side fetch. If you need user info, use useSupabaseUser() or pass user_id from client.
-// Removed legacy Database import. Using Supabase directly.
+export default function Page({ params }: { params: { id: string } }) {
+  // Unwrap params using React.use() for Next.js compatibility
+  // (for now, still support direct access for migration, but future-proof)
+  // See: https://nextjs.org/docs/messages/params-promise
+  const id = typeof params === 'object' && params !== null && 'id' in params ? params.id : undefined;
+  const { model } = useChatbotSettings();
+  const { user, loading } = useSupabaseUser();
+  const router = useRouter();
+  const [chat, setChat] = useState<any>(null);
+  const [messagesFromDb, setMessagesFromDb] = useState<any[]>([]);
+  const [loadingChat, setLoadingChat] = useState(true);
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const { id } = params;
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
 
-  // Fetch chat directly from Supabase
-  const { data: chat, error: chatError } = await supabase
-    .from('chats')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (chatError || !chat) {
-    notFound();
-  }
+  // Fetch chat and messages
+  useEffect(() => {
+    if (!id) return;
+    async function fetchChatAndMessages() {
+      setLoadingChat(true);
+      const { data: chatData } = await supabase
+        .from('chats')
+        .select('*')
+        .eq('id', id)
+        .single();
+      setChat(chatData);
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', id)
+        .order('created_at', { ascending: true });
+      setMessagesFromDb(messagesData || []);
+      setLoadingChat(false);
+    }
+    fetchChatAndMessages();
+  }, [id]);
 
-  // Fetch messages directly from Supabase
-  const { data: messagesFromDb, error: messagesError } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('chat_id', id)
-    .order('created_at', { ascending: true });
-  if (messagesError) throw messagesError;
-
-  function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
+  function convertToUIMessages(messages: any[]): any[] {
     return messages.map((message) => ({
       id: message.id,
-      parts: message.parts as UIMessage['parts'],
-      role: message.role as UIMessage['role'],
-      // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
-      createdAt: message.createdAt,
-      experimental_attachments:
-        (message.attachments as Array<Attachment>) ?? [],
+      role: message.role,
+      content: message.parts || message.content,
+      createdAt: message.created_at,
+      attachments: message.attachments || [],
     }));
   }
 
-  const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
-
-  if (!chatModelFromCookie) {
-    return (
-      <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedVisibilityType={chat.visibility}
-          isReadonly={true}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
-  }
+  if (loading || loadingChat) return <div>Loading...</div>;
+  if (!user) return null; // Already redirected
+  if (!chat) return <div>Chat not found</div>;
 
   return (
     <>
       <Chat
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
-        selectedChatModel={chatModelFromCookie.value}
+        selectedChatModel={model}
         selectedVisibilityType={chat.visibility}
         isReadonly={true}
       />
-      <DataStreamHandler id={id} />
+      <DataStreamHandler chatId={chat.id} />
     </>
   );
 }

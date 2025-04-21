@@ -15,6 +15,7 @@ import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
+import { fetchWithSupabaseAuth } from '@/lib/fetchWithSupabaseAuth';
 
 export function Chat({
   id,
@@ -54,6 +55,7 @@ export function Chat({
     onError: () => {
       toast.error('An error occurred, please try again!');
     },
+    fetch: fetchWithSupabaseAuth, // Ensure all chat API calls include Supabase Auth
   });
 
   const { data: votes } = useSWR<Array<Vote>>(
