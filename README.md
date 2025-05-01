@@ -29,14 +29,55 @@
   - Styling with [Tailwind CSS](https://tailwindcss.com)
   - Component primitives from [Radix UI](https://radix-ui.com) for accessibility and flexibility
 - Data Persistence
-  - [Supabase](https://supabase.com/) for authentication, chat history, feedback, and user data
-  - [Vercel Blob](https://vercel.com/storage/blob) for efficient file storage
+  - [Ducky.ai](https://ducky.ai/) for knowledge base storage, chunking, embedding, and retrieval (no longer using Vercel Blob)
 - [Auth.js](https://authjs.dev)
   - Simple and secure authentication
 
 ## Model Providers
 
 This template ships with [xAI](https://x.ai) `grok-2-1212` as the default chat model. However, with the [AI SDK](https://sdk.vercel.ai/docs), you can switch LLM providers to [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [Cohere](https://cohere.com/), and [many more](https://sdk.vercel.ai/providers/ai-sdk-providers) with just a few lines of code.
+
+## Retrieval-Augmented Generation (RAG) System
+
+### ⚡️ Now Powered by Ducky.ai
+
+This project uses [Ducky.ai](https://ducky.ai/) for all knowledge base document storage, chunking, embedding, indexing, and retrieval. Vercel Blob is no longer used for knowledge storage.
+
+- **Knowledge Base Upload**: Documents are uploaded directly to Ducky.ai, which handles chunking, embedding, and indexing.
+- **Retrieval**: When the chatbot receives a query, it retrieves relevant context from Ducky.ai using its API.
+- **Prompt Assembly**: Retrieved context is injected into the LLM prompt for accurate, context-aware responses.
+
+#### Key Changes:
+- All legacy chunking, embedding, and retrieval code using Supabase/pgvector or Vercel Blob is now disabled.
+- The `/api/chat` endpoint calls Ducky.ai for retrieval.
+- File uploads still use Vercel Blob, but chunking/embedding is handled by Ducky.ai.
+
+#### Environment Variable
+- Add your Ducky.ai API key to `.env` as:
+  ```env
+  DUCKY_API_KEY=your-ducky-api-key-here
+  ```
+- This is required for chat retrieval to function.
+
+#### Example Retrieval Call
+```js
+const response = await fetch('https://api.ducky.ai/v1/documents/retrieve', {
+  method: 'POST',
+  headers: {
+    'content-type': 'application/json',
+    'x-api-key': process.env.DUCKY_API_KEY,
+  },
+  body: JSON.stringify({
+    index_name: 'knowledge',
+    query: userQuestion,
+    top_k: 5,
+    alpha: 1,
+    rerank: false,
+  }),
+});
+const data = await response.json();
+const contextChunks = data.chunks.map(chunk => chunk.content).join('\n');
+```
 
 ## Deploy Your Own
 

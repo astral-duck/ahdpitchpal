@@ -7,8 +7,8 @@ Pitch Pal is a secure, mobile-first AI chatbot for American Home Design salespeo
 
 ### 2. Key Features
 - **Authentication:** Supabase Auth (no self-signup; admin creates and manages users via custom dashboard). Password reset by admin and by users (Supabase email reset flow).
-- **Knowledge Base:** Upload .txt (initially), PDF, and image files (future). Global knowledge base, updated a few times per year. Files stored in blob storage, chunked and indexed in Supabase for RAG.
-- **RAG Pipeline:** All knowledge base files are chunked and stored in a Supabase `rag_chunks` table with embeddings (pgvector), citations, and correction fields. Chatbot queries this table for retrieval-augmented answers.
+- **Knowledge Base:** Upload .txt (initially), PDF, and image files (future). Global knowledge base, updated a few times per year. Files stored and indexed in Ducky.ai for RAG (no longer in Vercel Blob).
+- **RAG Pipeline:** All knowledge base files are uploaded to Ducky.ai, which handles chunking, embedding, and retrieval. The chatbot queries Ducky.ai for relevant context to augment answers.
 - **Chatbot:** Uses xAI (preferred, with fallback to Groq/OpenAI) via AI SDK, strictly limited to knowledge base for answers. Friendly, sales-focused personality (Pitch Pal). Citations/sources included in responses. Admin can edit bot instructions/personality, scope, responsibilities, style, and model via dashboard settings.
 - **Chatbot Training:** Admins can review and correct chatbot answers via a Training interface. Corrections are stored in the RAG table and used to improve future responses. Feedback and corrections workflow integrated with flagged answers.
 - **Chat History:** Persistent per user, visible in hamburger menu. Admin can view all users’ chat histories via dashboard (select user dropdown).
@@ -18,18 +18,18 @@ Pitch Pal is a secure, mobile-first AI chatbot for American Home Design salespeo
     - View chats/feedback, adjust xAI settings, see analytics (total chats, tokens in/out, API cost, FAQ table, usage ranking, pending invites)
     - Edit chatbot instructions/personality, scope, responsibilities, style, and model
     - Manage training/corrections
-    - View API connection status (Supabase, Blob, Vercel, xAI, OpenAI)
+    - View API connection status (Supabase, Ducky.ai, Vercel, xAI, OpenAI)
     - Only visible to users with the admin role. Accessible via top navigation button when authenticated as admin.
 - **Branding:** Custom logos and colors as provided. Pitch Pal avatar for chatbot, user avatar is first initial.
 - **UI:** Minimal, mobile-first. Login → full-screen chat. Simple navigation.
-- **File Storage:** Vercel Blob for attachments and knowledge docs.
-- **Database:** Supabase (Postgres + pgvector) + Drizzle ORM.
+- **File Storage:** Ducky.ai for all knowledge base documents and attachments (no longer using Vercel Blob).
+- **Database:** Supabase (Postgres + Drizzle ORM).
 
 ### 3. Architecture
 - Next.js (App Router, RSCs)
 - AI SDK (xAI preferred, fallback Groq/OpenAI, RAG with knowledge base)
-- Supabase Auth & Database (Postgres + pgvector) + Drizzle ORM
-- Vercel Blob Storage
+- Supabase Auth & Database (Postgres + Drizzle ORM)
+- Ducky.ai (managed RAG: chunking, embedding, retrieval)
 - Tailwind CSS + shadcn/ui
 - Hosted on Vercel
 
@@ -40,7 +40,7 @@ Pitch Pal is a secure, mobile-first AI chatbot for American Home Design salespeo
 ### 5. Dashboard & Analytics
 - Visuals: total chats, tokens in/out, API cost (xAI), feedback logs
 - Table: most frequently asked questions (from chat history), filterable by time range (week/month/year)
-- Show connection status for Supabase, Blob, Vercel, xAI, OpenAI
+- Show connection status for Supabase, Ducky.ai, Vercel, xAI, OpenAI
 - Show users ranked by usage
 - Show pending email invites (if possible)
 
@@ -62,6 +62,11 @@ Pitch Pal is a secure, mobile-first AI chatbot for American Home Design salespeo
 ### 9. Mobile Experience
 - 99% mobile traffic expected
 - Responsive, mobile-first UI
+
+### 10. RAG Flow
+    1. Knowledge base files uploaded via admin dashboard
+    2. Files are uploaded directly to Ducky.ai, which handles chunking, embedding, and retrieval (no longer stored in Vercel Blob or chunked in Supabase)
+    3. Retrieval and context injection for chatbot answers is handled via Ducky.ai API
 
 ---
 

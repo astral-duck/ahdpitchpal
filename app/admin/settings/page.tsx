@@ -9,8 +9,8 @@ const supabase = createClientComponentClient();
 // xAI Grok models and pricing (per 1M tokens, USD)
 const XAI_MODELS = [
   {
-    id: 'grok-1.5rag',
-    name: 'Grok-1.5RAG',
+    id: 'grok-2',
+    name: 'Grok-2',
     tokenCostIn: 0.5, // $0.50 per 1M tokens
     tokenCostOut: 1.0, // $1.00 per 1M tokens
     recommended: true,
@@ -29,6 +29,20 @@ const XAI_MODELS = [
     tokenCostOut: 0.5,
     recommended: false,
   },
+  {
+    id: 'grok-3',
+    name: 'Grok-3',
+    tokenCostIn: 0.75, // Example pricing, update if needed
+    tokenCostOut: 1.5,
+    recommended: false,
+  },
+  {
+    id: 'grok-2-vision',
+    name: 'Grok-2 Vision',
+    tokenCostIn: 1.0, // Example pricing, update if needed
+    tokenCostOut: 2.0,
+    recommended: false,
+  },
 ];
 
 export default function AdminSettingsPage({ params }: { params?: Promise<any> }) {
@@ -36,7 +50,7 @@ export default function AdminSettingsPage({ params }: { params?: Promise<any> })
   const { role, loadingRole } = useUserRole();
   const router = useRouter();
   const [instructions, setInstructions] = useState("");
-  const [model, setModel] = useState("grok-1.5rag");
+  const [model, setModel] = useState("grok-2");
   const [tokenCostIn, setTokenCostIn] = useState("");
   const [tokenCostOut, setTokenCostOut] = useState("");
   const [apiBalance, setApiBalance] = useState("");
@@ -62,13 +76,13 @@ export default function AdminSettingsPage({ params }: { params?: Promise<any> })
         .single();
       if (data) {
         setInstructions(data.instructions || "");
-        setModel(data.model || "grok-1.5rag");
-        const modelInfo = XAI_MODELS.find((m) => m.id === (data.model || "grok-1.5rag")) || XAI_MODELS[0];
+        setModel(data.model || "grok-2");
+        const modelInfo = XAI_MODELS.find((m) => m.id === (data.model || "grok-2")) || XAI_MODELS[0];
         setTokenCostIn(String(modelInfo.tokenCostIn));
         setTokenCostOut(String(modelInfo.tokenCostOut));
       } else {
         setInstructions("");
-        setModel("grok-1.5rag");
+        setModel("grok-2");
         setTokenCostIn(String(XAI_MODELS[0].tokenCostIn));
         setTokenCostOut(String(XAI_MODELS[0].tokenCostOut));
       }

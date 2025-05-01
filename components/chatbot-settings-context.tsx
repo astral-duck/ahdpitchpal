@@ -9,7 +9,7 @@ interface ChatbotSettings {
   model: string;
 }
 
-const ChatbotSettingsContext = createContext<ChatbotSettings>({ model: "grok-1.5rag" });
+const ChatbotSettingsContext = createContext<ChatbotSettings>({ model: "grok-2" });
 
 export function useChatbotSettings() {
   return useContext(ChatbotSettingsContext);
@@ -34,7 +34,7 @@ function getNextCentral3AM(now: Date): Date {
 }
 
 export function ChatbotSettingsProvider({ children }: { children: React.ReactNode }) {
-  const [model, setModel] = useState<string>(cachedModel || "grok-1.5rag");
+  const [model, setModel] = useState<string>(cachedModel || "grok-2");
 
   useEffect(() => {
     async function fetchModelIfNeeded() {
@@ -52,8 +52,8 @@ export function ChatbotSettingsProvider({ children }: { children: React.ReactNod
           lastFetched = now.getTime();
           setModel(data.model);
         } else {
-          cachedModel = "grok-1.5rag";
-          setModel("grok-1.5rag");
+          cachedModel = "grok-2";
+          setModel("grok-2");
         }
       }
     }

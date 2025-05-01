@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { chunkAndEmbedFile } from "@/lib/chunkingPipeline";
 
 export const runtime = "edge";
 
@@ -16,12 +15,17 @@ export async function POST(req: NextRequest) {
     access: "public"
   });
 
-  // Start chunking/embedding pipeline (async, can be awaited or queued)
-  const result = await chunkAndEmbedFile({
-    fileName: file.name,
-    fileUrl: blob.url,
-    filePath: blob.pathname
-  });
+  // --- BEGIN: Legacy chunking/embedding trigger commented out ---
+  /*
+    // Start chunking/embedding pipeline (async, can be awaited or queued)
+    const result = await chunkAndEmbedFile({
+      fileName: file.name,
+      fileUrl: blob.url,
+      filePath: blob.pathname
+    });
+  */
+  // Ducky.ai now handles chunking/embedding. No-op here.
+  // --- END: Legacy chunking/embedding trigger commented out ---
 
-  return NextResponse.json({ success: true, blob, chunking: result });
+  return NextResponse.json({ success: true, blob });
 }

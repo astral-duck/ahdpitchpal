@@ -9,6 +9,8 @@ const supabase = createClient(
 const OPENAI_EMBEDDING_ENDPOINT = "https://api.openai.com/v1/embeddings";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+// --- BEGIN: Legacy chunking/embedding pipeline commented out ---
+/*
 export async function chunkAndEmbedFile({ fileName, fileUrl, filePath }: { fileName: string; fileUrl: string; filePath: string }) {
   console.log("[chunkAndEmbedFile] Starting for:", fileName, fileUrl, filePath);
   // Download file content
@@ -84,3 +86,5 @@ export async function chunkAndEmbedFile({ fileName, fileUrl, filePath }: { fileN
   }
   return { chunkCount: chunks.length };
 }
+*/
+// --- END: Legacy chunking/embedding pipeline commented out ---

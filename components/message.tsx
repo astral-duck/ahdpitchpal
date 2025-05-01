@@ -37,6 +37,8 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }) => {
+  // Debug log: show each message rendered
+  console.log('[PreviewMessage] message:', message);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
 
   return (

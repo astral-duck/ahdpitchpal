@@ -28,7 +28,14 @@
 - [ ] Admin dashboard view for flagged responses (user, timestamp, Q&A, full convo)
 - [ ] Admin training interface: review/correct answers, save corrections to RAG table
 
-## Step 6: Admin Dashboard Integration
+## Step 6: RAG Improvements & LLM Stream Robustness
+- [x] Implement OpenAI embedding for user queries in /api/chat
+- [x] Use pgvector similarity search for RAG context retrieval
+- [x] Improve error handling for LLM stream (surface errors to frontend)
+- [x] Add logging for all LLM and RAG operations
+- [ ] Test and verify silent fail scenarios are handled gracefully
+
+## Step 7: Admin Dashboard Integration
 - [x] Scaffolded nextjs-dashboard template into /app/admin, replacing placeholder UI
 - [x] Connected dashboard to Supabase for:
     - User management (list, create, remove users)
@@ -45,7 +52,7 @@
 - [ ] Replace all sample/stat placeholder data with live data from Supabase and blob storage
 - [ ] Polish UI for branding and mobile responsiveness
 
-## Step 7: Testing & Launch
+## Step 8: Testing & Launch
 - [ ] E2E tests (Playwright)
 - [ ] Final QA, bugfixes
 - [ ] Deploy to Vercel (ahdpitchpal.com)

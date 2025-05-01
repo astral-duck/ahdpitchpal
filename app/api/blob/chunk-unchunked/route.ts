@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { chunkAndEmbedFile } from "@/lib/chunkingPipeline";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -9,6 +8,8 @@ const supabase = createClient(
 
 // export const runtime = "edge"; // Comment out for better logging in Node.js runtime
 
+// --- BEGIN: Legacy chunk-unchunked endpoint commented out ---
+/*
 export async function POST(req: NextRequest) {
   console.log("[chunk-unchunked] POST endpoint triggered");
   try {
@@ -36,8 +37,8 @@ export async function POST(req: NextRequest) {
       const fileName = blob.key.split("-")[0] + ".txt"; // for display/metadata
       console.log("[chunk-unchunked] Processing file:", fileName, blob.url);
       try {
-        const result = await chunkAndEmbedFile({ fileName, fileUrl: blob.url, filePath: blob.key });
-        results.push({ fileName, url: blob.url, success: true, result });
+        // const result = await chunkAndEmbedFile({ fileName, fileUrl: blob.url, filePath: blob.key });
+        results.push({ fileName, url: blob.url, success: true });
       } catch (e) {
         console.error("[chunk-unchunked] Error processing file:", fileName, e);
         results.push({ fileName, url: blob.url, success: false, error: (e as Error).message });
@@ -50,3 +51,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: (e as Error).message }, { status: 500 });
   }
 }
+*/
+// --- END: Legacy chunk-unchunked endpoint commented out ---

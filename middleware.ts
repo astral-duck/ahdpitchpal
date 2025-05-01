@@ -16,6 +16,15 @@ const protectedPaths = [
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // --- PATCH: Allow API routes with Bearer token ---
+  if (
+    pathname.startsWith('/api/') &&
+    req.headers.get('authorization')?.startsWith('Bearer ')
+  ) {
+    return NextResponse.next();
+  }
+  // --------------------------------------------------
+
   // Allow static files, login, and complete-profile without checks
   if (
     pathname.startsWith('/login') ||
