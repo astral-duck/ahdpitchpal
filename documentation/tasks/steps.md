@@ -33,6 +33,9 @@
 - [x] Use pgvector similarity search for RAG context retrieval
 - [x] Improve error handling for LLM stream (surface errors to frontend)
 - [x] Add logging for all LLM and RAG operations
+- [x] Fixed frontend streaming: assistant responses are now accumulated and rendered in real time in the chat UI
+- [x] Added robust logging on both backend and frontend for streamed content
+- [x] Fixed memoization/render loop issues in chat UI
 - [ ] Test and verify silent fail scenarios are handled gracefully
 
 ## Step 7: Admin Dashboard Integration

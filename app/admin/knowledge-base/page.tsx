@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
-import DuckyKnowledgeList from "./DuckyKnowledgeList";
 import DuckyKnowledgeUpload from "./DuckyKnowledgeUpload";
 
 export default function AdminKnowledgeBasePage({ params }: { params?: Promise<any> }) {
@@ -23,7 +22,6 @@ export default function AdminKnowledgeBasePage({ params }: { params?: Promise<an
       <h2 className="text-2xl font-bold mb-4">Knowledge Base Management</h2>
       <div className="text-gray-500 mb-4">Upload, view, and manage docs in Ducky.ai knowledge base. Files are indexed and retrieved via Ducky.ai for RAG.</div>
       <DuckyKnowledgeUpload />
-      <DuckyKnowledgeList />
     </div>
   );
 }
